@@ -10,12 +10,13 @@ class Html:
         html_tag = self.html.replace('>', "").replace('<', '').split("\n")
         h=[]
         for i in html_tag:
-           h.append(i.lstrip(" "))
+            if not(i == "" or i == " "):
+               h.append(i.lstrip(" "))
         return h
 
     def list_tag(self):
         list_tag = []
-        html_tag = self.html.replace('>', "").replace('<', '').split("\n")
+        html_tag = self.tag()
         h=[]
         for i in html_tag:
            h.append(i.lstrip(" ").split(" "))
@@ -76,13 +77,33 @@ class Html:
         return list_dict
 
     def between(self, tag):
-        tags=self.tag()
-        list_tag = []
+        between_list = []
+        tags=self.list_tag()
+        index_list = []
         for i in tags:
-            list_tag.append(self.get_tag_map(i.split(" ")[0]))
-        for i in list_tag:
-            if i["tag"] :
-                pass
+            if i[0] == tag:
+                index_list.append(tags.index(i))
+            if i[0] == "/"+tag:
+                index_list.append(tags.index(i))
+        for i in range(0, len(index_list), 2):
+             b_list = []
+             for j in range(index_list[i], index_list[i+1]):
+                 b_list.append(self.get_tag_map(tags[j]))
+             between_list.append(b_list)
+        return between_list
+
+
+
+
+        # branch_list = []
+        # for i in index_list:
+        #     branch_list = []
+        #     for j in range(i[0], i[1]):
+        #         branch_list.append(tags[j])
+        #     between_list.append(branch_list)
+        # return between_list
+        print(index_list)
+
 
 
 # page = requests.get("https://www.digikala.com/")
@@ -155,11 +176,27 @@ omid_html = """
 </html>
 """
 
+line = lambda title : print("-"*30+title+"-"*30)
+
 h=Html(omid_html)
+line("orginal code")
 print(omid_html)
+line("-")
+line("tag")
+print(h.tag())
+line("list tag")
 print(h.list_tag())
+line("head")
 print(h.head())
-print("-"*100)
-print(h.finde_tag("form"))
-print("-"*100)
-print(h.get_tag_map("form"))
+line("body")
+print(h.body())
+line("finde tag")
+print(h.finde_tag("div"))
+line("get tag map")
+print(h.get_tag_map("div"))
+line("between")
+for i in h.between("p"):
+    print("[")
+    for j in i:
+        print(" ",j)
+    print("]")
