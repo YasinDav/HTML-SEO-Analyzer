@@ -6,6 +6,8 @@ class Html:
     def __init__(self, html:str):
         self.html = html
 
+    def __str__(self):
+        return str(self.html)
     def tag(self):
         html_tag = self.html.replace('>', "").replace('<', '').split("\n")
         h=[]
@@ -92,17 +94,15 @@ class Html:
              between_list.append(b_list)
         return between_list
 
-
-
-
-        # branch_list = []
-        # for i in index_list:
-        #     branch_list = []
-        #     for j in range(i[0], i[1]):
-        #         branch_list.append(tags[j])
-        #     between_list.append(branch_list)
-        # return between_list
-        print(index_list)
+    def remove_comment(self):
+        tags = self.html.split("\n")
+        for i in tags:
+            if str(i).lstrip(" ").startswith("<!--")and str(i).lstrip(" ").endswith("-->"):
+                tags.remove(i)
+        html = ""
+        for i in tags:
+            html += i + "\n"
+        self.html = html
 
 
 
@@ -200,3 +200,7 @@ for i in h.between("p"):
     for j in i:
         print(" ",j)
     print("]")
+line("____")
+line("____")
+h.remove_comment()
+print(h)
