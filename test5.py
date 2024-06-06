@@ -1,3 +1,4 @@
+from html.parser import HTMLParser
 import requests
 from bs4 import BeautifulSoup
 
@@ -8,6 +9,7 @@ class Html:
 
     def __str__(self):
         return str(self.html)
+
     def tag(self):
         html_tag = self.html.replace('>', "").replace('<', '').split("\n")
         h=[]
@@ -101,10 +103,73 @@ class Html:
                 tags.remove(i)
         html = ""
         for i in tags:
-            html += i + "\n"
+                html += i + "\n"
         self.html = html
+    def remove_space(self):
+        tags = self.html.split("\n")
+        html = ""
+        for i in tags:
+            if i == "" or i.isspace():
+                pass
+            else:
+                html += i + "\n"
+        self.html = html
+    class Parser(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.title = ""
+                self.paragraphs = []
 
+            def handle_starttag(self, tag, attrs):
+                if tag == "title":
+                    self.title = "Title: "
+                elif tag == "p":
+                    self.paragraphs.append("Paragraph: ")
 
+            def handle_data(self, data):
+                if self.title:
+                    self.title += data
+                if self.paragraphs:
+                    self.paragraphs[-1] += data
+
+            def get_title(self):
+                return self.title
+
+            def get_paragraphs(self):
+                return self.paragraphs
+
+line = lambda title : print("-"*30+title+"-"*30)
+
+line("--")
+html_string = """
+<html>
+<head>
+<title>Sample HTML Page</title>
+</head>
+<body>
+<h1>Welcome to my website!
+<p>This is a sample HTML page.
+</body>
+</html>
+"""
+
+parser = Html.Parser()
+parser.feed(html_string)
+
+title = parser.get_title()
+paragraphs = parser.get_paragraphs()
+
+print(title)
+for paragraph in paragraphs:
+    print(paragraph)
+
+line("-------")
+line("-------")
+line("-------")
+line("-------")
+line("-------")
+line("-------")
+line("-------")
 
 # page = requests.get("https://www.digikala.com/")
 # sup = BeautifulSoup(page.content, "html.parser")
@@ -176,7 +241,7 @@ omid_html = """
 </html>
 """
 
-line = lambda title : print("-"*30+title+"-"*30)
+
 
 h=Html(omid_html)
 line("orginal code")
@@ -200,7 +265,10 @@ for i in h.between("p"):
     for j in i:
         print(" ",j)
     print("]")
-line("____")
-line("____")
+line("----")
+line("----")
 h.remove_comment()
+print(h)
+line("#####")
+h.remove_space()
 print(h)
