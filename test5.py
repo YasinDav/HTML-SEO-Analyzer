@@ -50,18 +50,6 @@ self_closing_tags = ["area", "base", "br", "col", "embed", "hr", "img", "input",
 
 
 class Html:
-    closed_tag_html = [
-        ("!", "--"), ("!DOCTYPE html"), ("a", "a"), ("abbr", "abbr"),
-        ("address", "address"), ("area", "area"), ("map", "map"),
-        ("article", "article"), ("aside", "aside"), ("b", "b"), ("base"),
-        ("bdo", "bdo"), ("blockquote", "blockquote"), ("body", "body"),
-        ("br"), ("button", "button"), ("<caption>", "caption"), ("cite", "cite"),
-        ("code", "code"), ("col"), ("colgroup", "colgroup"), ("command", "command"),
-        ("details", "details"), ("div", "div"), ("datalist", "datalist"), ("dd", "dd"),
-        ("del", "del"), ("dfn", "dfn"), ("dialog", "dialog"), ("dl", "dl"), ("dt", "dt"),
-        ("data", "data"), ("em", "em"),
-    ]
-
     def __init__(self, html:str):
         self.html = html
 
