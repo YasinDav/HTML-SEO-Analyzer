@@ -83,12 +83,14 @@ class Html:
     def between(self, tag):
         between_list = []
         tags=self.list_tag()
+        print(tags)
         index_list = []
         for i in tags:
             if i[0] == tag:
                 index_list.append(tags.index(i))
             if i[0] == "/"+tag:
                 index_list.append(tags.index(i))
+        print(index_list)
         for i in range(0, len(index_list), 2):
              b_list = []
              for j in range(index_list[i], index_list[i+1]):
@@ -114,6 +116,9 @@ class Html:
             else:
                 html += i + "\n"
         self.html = html
+    def clean_html(self):
+        self.remove_comment()
+        self.remove_space()
     class Parser(HTMLParser):
             def __init__(self):
                 super().__init__()
@@ -138,38 +143,38 @@ class Html:
             def get_paragraphs(self):
                 return self.paragraphs
 
-line = lambda title : print("-"*30+title+"-"*30)
+line = lambda title : print(f"{"\033[00m"}-"*30+title+f"{"\033[00m"}-"*30)
 
-line("--")
-html_string = """
-<html>
-<head>
-<title>Sample HTML Page</title>
-</head>
-<body>
-<h1>Welcome to my website!
-<p>This is a sample HTML page.
-</body>
-</html>
-"""
-
-parser = Html.Parser()
-parser.feed(html_string)
-
-title = parser.get_title()
-paragraphs = parser.get_paragraphs()
-
-print(title)
-for paragraph in paragraphs:
-    print(paragraph)
-
-line("-------")
-line("-------")
-line("-------")
-line("-------")
-line("-------")
-line("-------")
-line("-------")
+# line("--")
+# html_string = """
+# <html>
+# <head>
+# <title>Sample HTML Page</title>
+# </head>
+# <body>
+# <h1>Welcome to my website!
+# <p>This is a sample HTML page.
+# </body>
+# </html>
+# """
+#
+# parser = Html.Parser()
+# parser.feed(html_string)
+#
+# title = parser.get_title()
+# paragraphs = parser.get_paragraphs()
+#
+# print(title)
+# for paragraph in paragraphs:
+#     print(paragraph)
+#
+# line("-------")
+# line("-------")
+# line("-------")
+# line("-------")
+# line("-------")
+# line("-------")
+# line("-------")
 
 # page = requests.get("https://www.digikala.com/")
 # sup = BeautifulSoup(page.content, "html.parser")
@@ -242,33 +247,96 @@ omid_html = """
 """
 
 
-
-h=Html(omid_html)
-line("orginal code")
-print(omid_html)
-line("-")
-line("tag")
-print(h.tag())
-line("list tag")
-print(h.list_tag())
-line("head")
-print(h.head())
-line("body")
-print(h.body())
-line("finde tag")
-print(h.finde_tag("div"))
-line("get tag map")
-print(h.get_tag_map("div"))
-line("between")
-for i in h.between("p"):
-    print("[")
-    for j in i:
-        print(" ",j)
-    print("]")
-line("----")
-line("----")
-h.remove_comment()
-print(h)
-line("#####")
-h.remove_space()
-print(h)
+#
+# h=Html(omid_html)
+# line("orginal code")
+# print(omid_html)
+# line("-")
+# line("tag")
+# print(h.tag())
+# line("list tag")
+# print(h.list_tag())
+# line("head")
+# print(h.head())
+# line("body")
+# print(h.body())
+# line("finde tag")
+# print(h.finde_tag("div"))
+# line("get tag map")
+# print(h.get_tag_map("div"))
+# line("between")
+# for i in h.between("a"):
+#     print("[")
+#     for j in i:
+#         print(" ",j)
+#     print("]")
+# line("----")
+# line("----")
+# h.remove_comment()
+# print(h)
+# line("#####")
+# h.remove_space()
+# print(h)
+again = True
+url = input(f"{'\x1b[38;5;4m'}Enter url : ")
+html_code_url = ""
+try:
+    page = requests.get(url)
+    sup = BeautifulSoup(page.content, "html.parser")
+    html_code_url = sup.prettify()
+    print(f"{'\033[32m'}Connected to "+f"{'\033[00m'}"+url.split(".")[1])
+    h = Html(html_code_url)
+    line("\033[93m" + "Html code")
+    print('\033[00m' + html_code_url)
+    line("\033[93m" + "Command")
+    again_code = ""
+except:
+    print(f"{"\033[31m"}Something went")
+    again = False
+while again:
+    x = input(f"{'\033[32m'}Choice one [tag, list_tag, head, body, find_tag, get_tag_map, between, remove_comment, remove_space, clean_html, exit, a (again)] : ")
+    if x == "a":
+        if again_code == "":
+            line("\033[93m" + "Don't enter anything")
+        x = again_code
+    if x == "exit":
+        line("\033[93m"+"Exit")
+        again = False
+        break
+    elif x == "tag":
+        line("\033[93m"+"tag")
+        print('\033[00m'+str(h.tag()))
+    elif x == "list_tag":
+        line("\033[93m"+"list tag")
+        print('\033[00m'+str(h.list_tag()))
+    elif x == "head":
+        line(f"{"\033[93m"}header")
+        print('\033[00m'+str(h.head()))
+    elif x == "body":
+        line(f"{"\033[93m"}body")
+        print(f"{"\033[35m"}body")
+        print('\033[00m'+str(h.body()))
+    elif x == "find_tag":
+        line(f"{"\033[93m"}find tag")
+        print('\033[00m'+str(h.finde_tag(input(f"{'\033[32m'}Enter tag name : "))))
+    elif x == "get_tag_map":
+        line(f"{"\033[93m"}get tag map")
+        print('\033[00m'+str(h.get_tag_map(input(f"{'\033[32m'}Enter tag name : "))))
+    elif x == "between":
+        line(f"{"\033[93m"}between")
+        print('\033[00m'+str(h.between(input(f"{'\033[32m'}Enter between tag name : "))))
+    elif x== "remove_comment":
+        line(f"{"\033[93m"}remove comment")
+        h.remove_comment()
+        print('\033[00m'+str(h))
+    elif x == "remove_space":
+        line(f"{"\033[93m"}remove space")
+        h.remove_space()
+        print('\033[00m'+str(h))
+    elif x == "clean_html":
+        line(f"{"\033[93m"}clean html")
+        h.clean_html()
+        print('\033[00m'+str(h))
+    else:
+        line(f"{"\033[31m"}unknown command")
+    again_code = x
