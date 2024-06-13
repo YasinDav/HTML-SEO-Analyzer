@@ -46,7 +46,7 @@ html_tags = [
     "dialog", "script", "noscript", "template", "canvas"
 ]
 # Tags that do not have closing tags
-self_closing_tags = ["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]
+self_closing_tags = ["!DOCTYPE html", "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]
 
 
 class Html:
@@ -127,24 +127,63 @@ class Html:
         return list_dict
 
     def between(self, tag):
+
         global self_closing_tags
         html = self.html
         if tag in self_closing_tags:
-            return ["0"]
+            return []
         else:
             if html.find(tag) == -1:
-                return ["1"]
+                return []
             else:
-                list4 = []
+                index = []
+                index2 = []
                 s=0
-
                 lenght = html.count(tag)/2
+                print(html[s+len(tag):len(html)])
                 for i in range(int(lenght)):
-                    start=html.find(tag, s+len(tag), len(html))
+                    start = html.find("<" + tag , s + len(tag), len(html))
+                    s = start
+                    index.append(start)
+                s=0
+                for i in range(int(lenght)):
+                    start = html.find("</"+tag, s+len(tag), len(html))
                     s=start
-                    end=html.rfind("/"+tag, s+len(tag), len(html))
-                    list4.append(html[start-1:end+len(tag)+2].replace("\n", "").replace("    ", ""))
-        return list4
+                    index2.append(start)
+
+
+                #____________________________________________________#
+                list8 = []
+                for i in range(len(index)):
+                    for j in range(len(index2)):
+                        if html[index[i]+len(tag)-1:index2[j]-1].count("<"+tag) == 0 :
+                            list8.append(html[index[i]+len(tag)+1:index2[i]-1].replace("  ", "").replace("\n", " "))
+
+
+
+
+
+                return list8, index, index2
+
+
+        # global self_closing_tags
+        # html = self.html
+        # if tag in self_closing_tags:
+        #     return ["0"]
+        # else:
+        #     if html.find(tag) == -1:
+        #         return ["1"]
+        #     else:
+        #         list4 = []
+        #         s=0
+        #
+        #         lenght = html.count(tag)/2
+        #         for i in range(int(lenght)):
+        #             start=html.find(tag, s+len(tag), len(html))
+        #             s=start
+        #             end=html.rfind("/"+tag, s+len(tag), len(html))
+        #             list4.append(html[start-1:end+len(tag)+2].replace("\n", "").replace("    ", ""))
+        # return list4
 
     def remove_comment(self):
         tags = self.html.split("\n")
@@ -167,6 +206,69 @@ class Html:
     def clean_html(self):
         self.remove_comment()
         self.remove_space()
+
+    def correct_line(self):
+        global self_closing_tags
+        self.clean_html()
+        l1 = ""
+        for i in self.html.split("\n"):
+            l1 += i.lstrip(" ")
+
+
+        html_correct = ""
+        for i in range(l1.count("<")):
+            li1 = l1[i:len(l1)].find("<")
+            preview = l1[i:len(l1)].find(">")
+            not_close = ""
+
+            for i in self_closing_tags:
+                if l1[li1+1:len(l1)].startswith(i) or l1[li1+1:len(l1)].startswith("html") or l1[li1+1:len(l1)].startswith("head") or l1[li1+1:len(l1)].startswith("body"):
+                    not_close = i
+                    break
+                elif not(l1[li1+1:len(l1)].startswith(i)):
+                    not_close = ""
+
+            html_correct += l1[li1:preview+1]
+            if not_close == "":
+                html_correct += "\n"
+                print(1)
+            else:
+                print(2)
+                end_tag = l1[li1:len(l1)].find("</"+not_close)
+                html_correct += l1[li1+len(l1[li1:preview]):end_tag+1]+"\n"
+            print("$", html_correct)
+        return None
+
+    def tab(self):
+        global self_closing_tags, html_tags
+        not_html_tags_list = []#like this : <br>
+        for i in html_tags:
+            if not(i in self_closing_tags):
+                not_html_tags_list.append(i)
+        back_slash_tags_closed = []#like this : </a>
+        for i in not_html_tags_list:
+            back_slash_tags_closed.append("/"+i)
+
+        self.clean_html()
+        tags = self.list_tag()
+        closed = 0
+        not_closed = 0
+        html_new_tab_code = ""
+        for i in tags:
+            s = ()
+            var = ""
+            e = ()
+            for j in i:
+                if j in self_closing_tags:
+                    closed += 1
+                    html_new_tab_code += j+"\n"
+                elif j in not_html_tags_list:
+                    not_closed += 1
+                    s = (tags.index(i), i.index(j))
+                elif j in back_slash_tags_closed:
+                    not_closed -= 1
+                    e = (tags.index(i), i.index(j))
+
     class Parser(HTMLParser):
             def __init__(self):
                 super().__init__()
@@ -352,13 +454,13 @@ h=Html(omid_html)
 #         print(f"{"\033[31m"}Something went")
 #         again = False
 # while again:
-#     x = input(f"{'\033[32m'}Choice one [tag, list_tag, head, body, find_tag, get_tag_map, between, remove_comment, remove_space, clean_html, exit, a (again)] : ")
+#     x = input(f"{'\033[32m'}Choice one [tag, list_tag, head, body, find_tag, get_tag_map, between, remove_comment, remove_space, clean_html, e (exit), a (again)] : ")
 #     if x == "a":
 #         if again_code == "":
 #             line("\033[93m" + "Don't enter anything")
 #         else:
 #             x = again_code
-#     if x == "exit":
+#     if x == "e":
 #         line("\033[93m"+"Exit")
 #         again = False
 #         break
@@ -400,6 +502,11 @@ h=Html(omid_html)
 #         line(f"{"\033[31m"}unknown command")
 #     again_code = x
 
-m=h.between("div")
-for i in m:
-    print(i+"\n")
+
+m=Html(omid_html)
+print(m.correct_line())
+
+
+# m=h.between("div")
+# for i in m:
+#     print(i+"\n")
